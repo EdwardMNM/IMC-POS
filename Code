@@ -1,0 +1,108 @@
+#include <iostream>
+#include <string>
+#include <cmath>  // Para usar funciones matemáticas estándar en C++
+
+
+using namespace std;
+// Función para calcular el IMC usando ensamblador
+double calcularIMC(double peso, double altura) {
+    double imc;
+    __asm {
+        fld qword ptr[peso]          // st(0) = peso
+        fld qword ptr[altura]        // st(0) = altura, st(1) = peso
+        fmul st(0), st(0)            // st(0) = altura^2, st(1) = peso
+        fld qword ptr[peso]          // st(0) = peso, st(1) = altura^2
+        fdiv st(0), st(1)            // st(0) = peso / altura^2
+        fstp qword ptr[imc]          // Guardar resultado en imc y vaciar la pila
+    }
+    return imc;
+}
+
+int main() {
+    string nombre;
+    double altura = 0.0, peso = 0.0;
+    string telefono;
+    string sexo;
+
+    // Validar entrada del nombre
+    while (true) {
+        cout << "Introduce tu nombre completo: ";
+        getline(cin, nombre);
+
+        // Verificar que el nombre no esté vacío
+        if (nombre.empty()) {
+            cout << "Error: El nombre no puede estar vacío. Inténtalo de nuevo.\n";
+        }
+        else {
+            break;  // Entrada válida
+        }
+    }
+
+    // Validar entrada de altura
+    while (true) {
+        cout << "Introduce tu altura (en metros, por ejemplo, 1.75): ";
+        cin >> altura;
+
+        // Verificar si la entrada es válida
+        if (cin.fail() || altura <= 0) {
+            cout << "Error: La altura debe ser un número positivo mayor a 0.\n";
+            cin.clear();  // Limpiar el estado de error de cin
+            cin.ignore(1000, '\n');  // Ignorar el resto de la línea
+        }
+        else {
+            break;  // Entrada válida
+        }
+    }
+    // Validar entrada de peso
+    while (true) {
+        cout << "Introduce tu peso (en kg, por ejemplo, 70): ";
+        cin >> peso;
+
+        // Verificar si la entrada es válida
+        if (cin.fail() || peso <= 0) {
+            cout << "Error: El peso debe ser un número positivo mayor a 0.\n";
+            cin.clear();  // Limpiar el estado de error de cin
+            cin.ignore(1000, '\n');  // Ignorar el resto de la línea
+        }
+        else {
+            break;  // Entrada válida
+        }
+    }
+    cout << "Introduce que sexo eres (masculino o femenino): ";
+    cin >> sexo;
+    // Limpiar el buffer de entrada antes de usar std::getline
+    cin.ignore();
+
+    // Pedir número telefónico
+    cout << "Introduce tu numero telefonico: ";
+    getline(std::cin, telefono);
+
+    // Calcular el IMC
+    double imc = calcularIMC(peso, altura);
+
+    // Determinar el estado del IMC
+    string estado;
+    if (imc < 18.5) {
+        estado = "Bajo peso";
+    }
+    else if (imc >= 18.5 && imc < 24.9) {
+        estado = "Peso normal";
+    }
+    else if (imc >= 25 && imc < 29.9) {
+        estado = "Sobrepeso";
+    }
+    else {
+        estado = "Obesidad";
+    }
+
+    // Imprimir todos los datos
+    cout << "\nDatos ingresados:\n";
+    cout << "Nombre: " << nombre << std::endl;
+    cout << "Sexo: " << sexo << std::endl;
+    cout << "Altura: " << altura << " metros" << std::endl;
+    cout << "Peso: " << peso << " kg" << std::endl;
+    cout << "IMC: " << imc << std::endl;
+    cout << "Estado: " << estado << std::endl;
+
+    return 0;
+}
